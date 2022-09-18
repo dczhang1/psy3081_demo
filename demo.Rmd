@@ -9,6 +9,7 @@ library(readr)
 library(tidyverse)
 library(ggthemes)
 library(ggalt)
+library(tidyquant)
 demo_data <- read_csv("demo_data.csv")
 
 long_data <- demo_data %>%
@@ -29,6 +30,25 @@ long_data %>%
             lims(y = c(1,10)) +
             theme_economist() + 
             theme(axis.title.x = element_blank())
+
+long_data %>%
+            ggplot(aes(x = factor(Trait), y = Score, fill = factor(Trait))) + 
+            ggdist::stat_halfeye(
+                        adjust = .8,
+                        justification = 0.2,
+                        .width = 0,
+                        alpha = .5
+            ) + 
+            geom_boxplot(
+                        width = .1,
+                        outlier.color = NA,
+                        alpha = .8
+            ) + 
+            geom_jitter() + 
+            lims(y = c(1,10)) +
+            theme_pander() + 
+            theme(axis.title.x = element_blank(),
+                  legend.position = "none")
 ```
 
 ```{r}
@@ -39,7 +59,12 @@ c(list(
                            mean(demo_data$SC2),
                            mean(demo_data$SC3),
                            mean(demo_data$SC4)),
-            MyScore = c(7, 9, 5, 3, 2) # Put your own Big Five score here (Scored out of 10)
+            # Put your own Big Five score here (Scored out of 10)
+            MyScore = c(7, # openess
+                        9, # consc
+                        5, # extro
+                        3, # agree
+                        2) # neuro
 )) %>% 
             data.frame() %>%
             ggplot(aes(x = ClassScore, xend = MyScore, y = Traits, group = Traits)) +
