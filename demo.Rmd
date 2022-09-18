@@ -1,0 +1,60 @@
+---
+title: "psy3081_demo"
+output: html_document
+date: "2022-09-18"
+---
+
+```{r}
+library(readr)
+library(tidyverse)
+library(ggthemes)
+library(ggalt)
+demo_data <- read_csv("demo_data.csv")
+
+long_data <- demo_data %>%
+            rename(Openess = SC0,
+                   Conscientiousness = SC1,
+                   Extroversion = SC2,
+                   Agreeableness = SC3,
+                   Neuroticism = SC4) %>%
+            pivot_longer(cols = Openess:Neuroticism, 
+                         names_to = "Trait",
+                         values_to = "Score") %>%
+            select(Trait, Score)
+
+long_data %>%
+            ggplot(aes(x = factor(Trait), y = Score)) + 
+            geom_boxplot() +
+            geom_jitter() +
+            lims(y = c(1,10)) +
+            theme_economist() + 
+            theme(axis.title.x = element_blank())
+```
+
+```{r}
+c(list(
+            Traits = c("Openess", "Conscientiousness", "Extroversion", "Agreeable", "Neuroticism"),
+            ClassScore = c(mean(demo_data$SC0),
+                           mean(demo_data$SC1),
+                           mean(demo_data$SC2),
+                           mean(demo_data$SC3),
+                           mean(demo_data$SC4)),
+            MyScore = c(7, 9, 5, 3, 2) # Put your own Big Five score here (Scored out of 10)
+)) %>% 
+            data.frame() %>%
+            ggplot(aes(x = ClassScore, xend = MyScore, y = Traits, group = Traits)) +
+            geom_dumbbell(
+                        colour_xend = "blue",
+                        colour_x = "red",
+                        size_x = 4,
+                        size_xend = 4,
+                        show.legend = T
+            ) + 
+            theme_economist() + 
+            labs(x = "Score", y = "Trait", title = "Personality score gap", 
+                 subtitle = "Blue = My Self-Rating") + 
+            lims(x = c(1, 10))
+            
+            
+```
+
